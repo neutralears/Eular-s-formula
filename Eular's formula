@@ -1,0 +1,19 @@
+alpha = 0.05; % incubation period (5 days)
+beta = 1.75; % average contact rate
+gamma = 0.5; % 1/gamma is mean infectious period (2 days)
+R0 = beta/gamma; % reproduction number
+% Normalized population with S+E+I+R = 1.
+N0 = 10000; % initial population, one person infectious
+u0 = [1-1/N0, 0, 1/N0, 0]; % initial values with sum(u0)=1
+% RHS function for the SEIR ODE with u=[S,E,I,R]
+f = @(u) [ -beta*u(1)*u(3), beta*u(1)*u(3)-alpha*u(2), ...
+alpha*u(2)-gamma*u(3), gamma*u(3) ];
+dt = 0.1;
+t = [0 : dt : 100]';
+nt = length(t)-1;
+u = zeros(nt+1, 4);
+u(1,:) = u0; % initialize SEIR values
+% Euler time-stepping loop
+for k = 1 : nt,
+    u(k+1,:) = u(k,:) + dt * f(u(k,:));
+end
